@@ -151,12 +151,12 @@ public class Notepad implements ActionListener {
             case "Save" -> functionFile.saveFile();
             case "Exit" -> functionFile.exit();
             case "Word Wrap" -> functionFormat.wordWrap();
-            case "Arial" -> functionFormat.fontArial();
-            case "Comic Sans MS" -> functionFormat.fontCSMS();
-            case "Times New Roman" -> functionFormat.fontTNR();
-            case "12" -> functionFormat.fontSize12();
-            case "16" -> functionFormat.fontSize16();
-            case "20" -> functionFormat.fontSize20();
+            case "Arial" -> functionFormat.setFont("Arial");
+            case "Comic Sans MS" -> functionFormat.setFont("Comic Sans MS");
+            case "Times New Roman" -> functionFormat.setFont("Times New Roman");
+            case "12" -> functionFormat.setFontSize(12);
+            case "16" -> functionFormat.setFontSize(16);
+            case "20" -> functionFormat.setFontSize(20);
         }
     }
 }

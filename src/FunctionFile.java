@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 
@@ -25,7 +24,7 @@ public class FunctionFile {
         try {
             BufferedReader br = new BufferedReader(new FileReader(fileAddress + fileName));
             notepad.textArea.setText("");
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null) {
                 notepad.textArea.append(line + "\n");
             }
