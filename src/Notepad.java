@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,11 +24,17 @@ public class Notepad implements ActionListener {
     // format menu
     JMenuItem formatWrap, fontArial, fontCSMS, fontTNR, fontSize12,fontSize16, fontSize20;
     JMenu menuFont, menuFontSize;
-
+    // Color menu
+    JMenuItem cColor1, cColor2, cColor3;
+    // edit menu
+    JMenuItem eUndo, eRedo;
 
     FunctionFile functionFile = new FunctionFile(this);
     FunctionFormat functionFormat = new FunctionFormat(this);
+    FunctionColor functionColor = new FunctionColor(this);
+    FunctionEdit functionEdit = new FunctionEdit(this);
 
+    UndoManager manager = new UndoManager();
     public static void main(String[] args) {
        new Notepad();
     }
@@ -37,6 +44,8 @@ public class Notepad implements ActionListener {
         createMenuBar();
         createFileMenu();
         createFormatMenu();
+        createColorMenu();
+        createEditMenu();
         window.setVisible(true);
 
     }
@@ -48,6 +57,10 @@ public class Notepad implements ActionListener {
     public void createTextArea(){
         textArea = new JTextArea();
         textArea.setFont(defaultFont);
+
+        textArea.getDocument().addUndoableEditListener(
+                e -> manager.addEdit(e.getEdit())
+        );
         scrollPane = new JScrollPane(textArea,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -72,30 +85,11 @@ public class Notepad implements ActionListener {
         menuBar.add(menuColor);
     }
     public void createFileMenu(){
-        fNew = new JMenuItem("New");
-        fNew.addActionListener(this);
-        fNew.setActionCommand("New");
-        menuFile.add(fNew);
-
-        fOpen = new JMenuItem("Open");
-        fOpen.addActionListener(this);
-        fOpen.setActionCommand("Open");
-        menuFile.add(fOpen);
-
-        fSave = new JMenuItem("Save");
-        fSave.addActionListener(this);
-        fSave.setActionCommand("Save");
-        menuFile.add(fSave);
-
-        fSaveAs = new JMenuItem("Save as");
-        fSaveAs.addActionListener(this);
-        fSaveAs.setActionCommand("Save as");
-        menuFile.add(fSaveAs);
-
-        fExit = new JMenuItem("Exit");
-        fExit.addActionListener(this);
-        fExit.setActionCommand("Exit");
-        menuFile.add(fExit);
+        addItemToMenu(menuFile, fNew, "New");
+        addItemToMenu(menuFile, fOpen, "Open");
+        addItemToMenu(menuFile, fSave, "Save");
+        addItemToMenu(menuFile, fSaveAs, "Save as");
+        addItemToMenu(menuFile, fExit, "Exit");
     }
     public void createFormatMenu(){
         formatWrap = new JMenuItem("Word Wrap: Off");
@@ -106,38 +100,32 @@ public class Notepad implements ActionListener {
         menuFont = new JMenu("Font");
         menuFormat.add(menuFont);
 
-        fontArial = new JMenuItem("Arial");
-        fontArial.addActionListener(this);
-        fontArial.setActionCommand("Arial");
-        menuFont.add(fontArial);
-
-        fontCSMS = new JMenuItem("Comic Sans MS");
-        fontCSMS.addActionListener(this);
-        fontCSMS.setActionCommand("Comic Sans MS");
-        menuFont.add(fontCSMS);
-
-        fontTNR = new JMenuItem("Times New Roman");
-        fontTNR.addActionListener(this);
-        fontTNR.setActionCommand("Times New Roman");
-        menuFont.add(fontTNR);
+        addItemToMenu(menuFont, fontArial, "Arial");
+        addItemToMenu(menuFont, fontCSMS, "Comic Sans MS");
+        addItemToMenu(menuFont, fontTNR, "Times New Roman");
 
         menuFontSize = new JMenu("Font Size");
         menuFormat.add(menuFontSize);
 
-        fontSize12 = new JMenuItem("12");
-        fontSize12.addActionListener(this);
-        fontSize12.setActionCommand("12");
-        menuFontSize.add(fontSize12);
+        addItemToMenu(menuFontSize, fontSize12, "12");
+        addItemToMenu(menuFontSize, fontSize16, "16");
+        addItemToMenu(menuFontSize, fontSize20, "20");
+    }
+    public void createColorMenu(){
+        addItemToMenu(menuColor, cColor1, "White");
+        addItemToMenu(menuColor, cColor2, "Black");
+        addItemToMenu(menuColor, cColor3, "Blue");
+    }
+    public void createEditMenu(){
+        addItemToMenu(menuEdit, eRedo, "Redo");
+        addItemToMenu(menuEdit, eUndo, "Undo");
+    }
+    public void addItemToMenu(JMenu menu, JMenuItem menuItem, String text){
+        menuItem = new JMenuItem(text);
+        menuItem.addActionListener(this);
+        menuItem.setActionCommand(text);
+        menu.add(menuItem);
 
-        fontSize16 = new JMenuItem("16");
-        fontSize16.addActionListener(this);
-        fontSize16.setActionCommand("16");
-        menuFontSize.add(fontSize16);
-
-        fontSize20 = new JMenuItem("20");
-        fontSize20.addActionListener(this);
-        fontSize20.setActionCommand("20");
-        menuFontSize.add(fontSize20);
     }
 
     @Override
@@ -150,6 +138,8 @@ public class Notepad implements ActionListener {
             case "Save as" -> functionFile.saveFileAs();
             case "Save" -> functionFile.saveFile();
             case "Exit" -> functionFile.exit();
+            case "Undo" -> functionEdit.undo();
+            case "Redo" -> functionEdit.redo();
             case "Word Wrap" -> functionFormat.wordWrap();
             case "Arial" -> functionFormat.setFont("Arial");
             case "Comic Sans MS" -> functionFormat.setFont("Comic Sans MS");
@@ -157,6 +147,9 @@ public class Notepad implements ActionListener {
             case "12" -> functionFormat.setFontSize(12);
             case "16" -> functionFormat.setFontSize(16);
             case "20" -> functionFormat.setFontSize(20);
+            case "White" -> functionColor.changeColor("White");
+            case "Black" -> functionColor.changeColor("Black");
+            case "Blue" -> functionColor.changeColor("Blue");
         }
     }
 }
